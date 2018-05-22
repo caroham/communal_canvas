@@ -12,7 +12,11 @@ export class AppComponent implements OnInit {
 
   @ViewChild('canvas') canvas: ElementRef;
 
-  colors = ["blue", "pink", "black", "yellow", "purple", "orange"]
+  colors = ["blue", "pink", "black", "yellow", "#ab0cfe", "orange", "#fe3a0c", "#00ff00"];
+
+  dbEmpty = false;
+  pastStrokes;
+  testArr = [];
 
   public ctx: CanvasRenderingContext2D;
   flag = false;
@@ -43,34 +47,34 @@ export class AppComponent implements OnInit {
 
   @HostListener('mouseup', ['$event'])
   onmouseup(event: MouseEvent){
-    // console.log("in mouseup", event, event.type);
     this.findxy('up', event);
   }
 
   @HostListener('mousedown', ['$event'])
   onmousedown(event: MouseEvent){
-    // console.log("in mousedown", event, event.type);
     this.findxy('down', event);
   }
 
   @HostListener('mouseout', ['$event'])
   onmouseout(event: MouseEvent){
-    // console.log("in mouseout", event, event.type);
     this.findxy('out', event);
   }
 
   @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent){
-    console.log("in keyevent: ", event);
-    if(event.code == "ArrowDown") {
+  keyEvent(event: KeyboardEvent) {
+    console.log("in keyevent: ", event.code);
+    if(event.code == "Minus") {
       if(this.sWeight > 0) {
-        this.sWeight --;
+        this.sWeight -=4;
       }
     }
-    if(event.code == "ArrowUp") {
+    if(event.code == "Equal") {
       if(this.sWeight <= 40) {
-        this.sWeight ++;
+        this.sWeight +=4;
       }
+    }
+    if(event.code == "KeyW") {
+      this.randWeight();
     }
   }
 
@@ -87,7 +91,38 @@ export class AppComponent implements OnInit {
     this.h = this.canvasEl.height;
 
     this.randColor();
+    this.randWeight();
     console.log("canvas width: ", this.canvasEl.width, this.ctx);
+
+    // let observableD = this.socket.deletePaths();
+    // observableD.subscribe(data => {
+    //   if(data['message'] === "Success"){
+    //     console.log("successfully deleted paths");
+    //   } else {
+    //     console.log("didn't work! message: ", data['error']['message']);
+    //   }
+    // });
+
+    let observable = this.socket.getPaths();
+    observable.subscribe(data => {
+      if(data['message'] === "Success"){
+        console.log("successfully got paths");
+        this.pastStrokes = data;
+        console.log("past strokes: ", this.pastStrokes);
+        if(this.pastStrokes['data'] === null){
+          this.dbEmpty = true;
+        } else {
+          let strokesArr = this.pastStrokes['data']['paths'];
+          for(let i=0; i<strokesArr.length; i++){
+            this.draw(strokesArr[i]['prevX'], strokesArr[i]['prevY'], strokesArr[i]['currX'], strokesArr[i]['currY'], strokesArr[i]['color'], strokesArr[i]['weight']);
+          }
+
+        } 
+      } else {
+        console.log("didn't work! message: ", data['error']['message']);
+      }
+    });
+
   }
 
 ///////////
@@ -108,6 +143,7 @@ export class AppComponent implements OnInit {
     this.ctx.beginPath();
     this.ctx.moveTo(pX, pY);
     this.ctx.lineTo(cX, cY);
+    // this.ctx.bezierCurveTo(pX, pY, ((cX-pX)/2), ((cY-pY)/2), cX, cY);
     this.ctx.strokeStyle = sCol;
     this.ctx.lineWidth = sWei;
     this.ctx.stroke();
@@ -142,6 +178,16 @@ export class AppComponent implements OnInit {
     if(res == 'down') {
       this.flag = false;
       this.randColor()
+      // for(let i = 0; i < this.testArr.length; i++) {
+      //   this.draw(
+      //     this.testArr[i]['prevX'],
+      //     this.testArr[i]['prevY'],
+      //     this.testArr[i]['currX'],
+      //     this.testArr[i]['currY'],
+      //     this.testArr[i]['color'],
+      //     this.testArr[i]['weight']
+      //    )
+      // }
     }
 
     if (res == 'up' || res == 'out'){
@@ -156,7 +202,7 @@ export class AppComponent implements OnInit {
       if(this.dot_flag) {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.sColor;
-        this.ctx.fillRect(this.currX, this.currY, 2, 2);
+        this.ctx.fillRect(this.currX, this.currY, (this.sWeight/2), (this.sWeight/2));
         this.ctx.closePath();
         this.dot_flag = false;
       }
@@ -165,30 +211,75 @@ export class AppComponent implements OnInit {
     if(res == 'move') {
       if (this.flag) {
         this.viewportOffset = this.canvasEl.getBoundingClientRect();
-        console.log('viewport offset: ', this.viewportOffset);
+
         this.prevX = this.currX;
         this.prevY = this.currY;
         this.currX = e.clientX - this.canvasEl.offsetLeft - this.viewportOffset.left;
         this.currY = e.clientY - this.canvasEl.offsetTop - this.viewportOffset.top;
 
-        console.log('curr & prev after reset: ', this.currX, this.currY, this.prevX, this.prevY);
         this.draw(this.prevX, this.prevY, this.currX, this.currY, this.sColor, this.sWeight);
-        this.socket.send({
+
+        if(this.testArr.length>100){
+          if(this.dbEmpty===true){
+            console.log("in if, database is empty");
+            this.postPaths();
+          }
+          this.updatePaths();
+          this.testArr = [];
+        }
+
+        let dict = {
           prevX: this.prevX,
           prevY: this.prevY,
           currX: this.currX,
           currY: this.currY,
           color: this.sColor,
           weight: this.sWeight
-        });
+        }
+
+        console.log('dictionary =======', dict);
+        this.testArr.push(dict);
+
+        this.socket.send(dict);
       }
     }
   }
+
+  randWeight() {
+    let randInt = (Math.floor(Math.random()*40))+1;
+    this.sWeight = randInt;
+  }
+
 
   randColor() {
     let rand = Math.floor(Math.random()*this.colors.length);
     this.sColor = this.colors[rand];
   }
 
+  updatePaths(){
+    console.log('===in update paths func');
+    let observable = this.socket.addPaths(this.testArr);
+    observable.subscribe(data =>{
+      console.log('path data: ', data);
+      if(data['message'] === "Success"){
+        console.log("successfully updated paths");
+      } else {
+        console.log("didn't work! message: ", data['error']['message']);
+      }
+    })
+  }
+
+  postPaths(){
+    console.log('===in update paths func');
+    let observable = this.socket.saveFirstPaths(this.testArr);
+    observable.subscribe(data =>{
+      console.log('path data: ', data);
+      if(data['message'] === "Success"){
+        console.log("successfully posted paths");
+      } else {
+        console.log("didn't work! message: ", data['error']['message']);
+      }
+    })
+  }
 
 }

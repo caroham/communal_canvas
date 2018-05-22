@@ -26,4 +26,23 @@ export class SocketService {
       this.socket.on('other_move', (data) => observer.next(data));
     })
   }
+
+  getPaths() {
+    console.log('in socket.service get paths!');
+    return this._http.get('/paths');
+  }
+
+  saveFirstPaths(paths){
+    console.log('in socket.service save first paths!');
+    return this._http.post('/paths', paths);
+  }
+
+  addPaths(paths) {
+    console.log('in socket.service addPaths!, path data: ', paths);
+    return this._http.put('/paths', paths);
+  }
+
+  deletePaths(){
+    return this._http.delete('/delete');
+  }
 }
