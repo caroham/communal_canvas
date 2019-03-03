@@ -1,2 +1,6 @@
+<div id="instruction-overlay" *ngIf="showOverlay">
+    <h1>Instructions</h1>
+    <button (click)="closeOverlay()">Close</button>
+</div>
 <canvas id="canvas" #canvas width="2000px" height="3000px"></canvas>
 <router-outlet></router-outlet>

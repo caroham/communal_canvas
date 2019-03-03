@@ -2,4 +2,18 @@
     width: 2000px;
     height: 3000px;
     background-color: #ffbb7e;
+    /* background-color: #f3c795; */
+    /* background-color: #e9d9cb; */
+    /* background-color: #f3d1b4; */
+    /* background-color: #fff; */
+    z-index: 1;
+}
+
+#instruction-overlay {
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    position: absolute;
+    background-color: #fff;
+    padding: 120px;
 }

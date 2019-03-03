@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
 
   canvasEl: HTMLCanvasElement;
   viewportOffset;
+  showOverlay = true;
 
   sColor = "blue";
   sWeight = 20;
@@ -41,27 +42,32 @@ export class AppComponent implements OnInit {
 
   @HostListener('mousemove', ['$event'])
   onmousemove(event: MouseEvent){
+    if(this.showOverlay){return;}
     console.log("in mousemove", event, event.type);
     this.findxy('move', event);
   }
 
   @HostListener('mouseup', ['$event'])
   onmouseup(event: MouseEvent){
+    if(this.showOverlay){return;}
     this.findxy('up', event);
   }
 
   @HostListener('mousedown', ['$event'])
   onmousedown(event: MouseEvent){
+    if(this.showOverlay){return;}
     this.findxy('down', event);
   }
 
   @HostListener('mouseout', ['$event'])
   onmouseout(event: MouseEvent){
+    if(this.showOverlay){return;}
     this.findxy('out', event);
   }
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
+    if(this.showOverlay){return;}
     console.log("in keyevent: ", event.code);
     if(event.code == "Minus") {
       if(this.sWeight > 0) {
@@ -93,15 +99,6 @@ export class AppComponent implements OnInit {
     this.randColor();
     this.randWeight();
     console.log("canvas width: ", this.canvasEl.width, this.ctx);
-
-    // let observableD = this.socket.deletePaths();
-    // observableD.subscribe(data => {
-    //   if(data['message'] === "Success"){
-    //     console.log("successfully deleted paths");
-    //   } else {
-    //     console.log("didn't work! message: ", data['error']['message']);
-    //   }
-    // });
 
     let observable = this.socket.getPaths();
     observable.subscribe(data => {
@@ -143,51 +140,16 @@ export class AppComponent implements OnInit {
     this.ctx.beginPath();
     this.ctx.moveTo(pX, pY);
     this.ctx.lineTo(cX, cY);
-    // this.ctx.bezierCurveTo(pX, pY, ((cX-pX)/2), ((cY-pY)/2), cX, cY);
     this.ctx.strokeStyle = sCol;
     this.ctx.lineWidth = sWei;
     this.ctx.stroke();
     this.ctx.closePath();
   }
 
-
-  // draw() {
-  //   console.log('in draw func')
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(this.prevX, this.prevY);
-  //   this.ctx.lineTo(this.currX, this.currY);
-  //   this.ctx.strokeStyle = this.sColor;
-  //   this.ctx.lineWidth = this.sWeight;
-  //   this.ctx.stroke();
-  //   this.ctx.closePath();
-  // }
-
-  // erase() {
-  //   let yes = confirm("Want to clear");
-  //   if (yes) {
-  //       this.ctx.clearRect(0, 0, this.w, this.h);
-  //       this.canvasEl.style.display = "none";
-  //   }
-  // }
-
-  // save() {
-
-  // }
-
   findxy(res, e) {
     if(res == 'down') {
       this.flag = false;
       this.randColor()
-      // for(let i = 0; i < this.testArr.length; i++) {
-      //   this.draw(
-      //     this.testArr[i]['prevX'],
-      //     this.testArr[i]['prevY'],
-      //     this.testArr[i]['currX'],
-      //     this.testArr[i]['currY'],
-      //     this.testArr[i]['color'],
-      //     this.testArr[i]['weight']
-      //    )
-      // }
     }
 
     if (res == 'up' || res == 'out'){
@@ -280,6 +242,10 @@ export class AppComponent implements OnInit {
         console.log("didn't work! message: ", data['error']['message']);
       }
     })
+  }
+
+  closeOverlay() {
+    this.showOverlay = false;
   }
 
 }
