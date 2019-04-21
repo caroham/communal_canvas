@@ -13,6 +13,7 @@ export class AppComponent implements OnInit {
   @ViewChild('canvas') canvas: ElementRef;
 
   colors = ["blue", "pink", "black", "yellow", "#ab0cfe", "orange", "#fe3a0c", "#00ff00"];
+  strokeTypes = ["default", "circle"];
 
   dbEmpty = false;
   pastStrokes;
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit {
 
   sColor = "blue";
   sWeight = 20;
+  sType = "default";
 
   w=0;
   h=0;
@@ -43,7 +45,7 @@ export class AppComponent implements OnInit {
   @HostListener('mousemove', ['$event'])
   onmousemove(event: MouseEvent){
     if(this.showOverlay){return;}
-    console.log("in mousemove", event, event.type);
+    // console.log("in mousemove", event, event.type);
     this.findxy('move', event);
   }
 
@@ -68,7 +70,7 @@ export class AppComponent implements OnInit {
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if(this.showOverlay){return;}
-    console.log("in keyevent: ", event.code);
+    // console.log("in keyevent: ", event.code);
     if(event.code == "Minus") {
       if(this.sWeight > 0) {
         this.sWeight -=4;
@@ -98,14 +100,11 @@ export class AppComponent implements OnInit {
 
     this.randColor();
     this.randWeight();
-    console.log("canvas width: ", this.canvasEl.width, this.ctx);
 
     let observable = this.socket.getPaths();
     observable.subscribe(data => {
       if(data['message'] === "Success"){
-        console.log("successfully got paths");
         this.pastStrokes = data;
-        console.log("past strokes: ", this.pastStrokes);
         if(this.pastStrokes['data'] === null){
           this.dbEmpty = true;
         } else {
@@ -129,14 +128,12 @@ export class AppComponent implements OnInit {
     console.log('in init socket connect');
 
     this.socket.onOtherMove().subscribe((data)=> {
-      console.log('======== in on other move', data)
       this.draw(data['data']['prevX'], data['data']['prevY'], data['data']['currX'], data['data']['currY'], data['data']['color'], data['data']['weight'])
     })
 
   }
 
   draw(pX, pY, cX, cY, sCol, sWei) {
-    console.log('in draw func', pX, pY, cX, cY, sCol, sWei)
     this.ctx.beginPath();
     this.ctx.moveTo(pX, pY);
     this.ctx.lineTo(cX, cY);
@@ -147,9 +144,11 @@ export class AppComponent implements OnInit {
   }
 
   findxy(res, e) {
+    console.log("res: ", res, ", e: ", e);
     if(res == 'down') {
       this.flag = false;
       this.randColor()
+      this.randStrokeType();
     }
 
     if (res == 'up' || res == 'out'){
@@ -199,7 +198,6 @@ export class AppComponent implements OnInit {
           weight: this.sWeight
         }
 
-        console.log('dictionary =======', dict);
         this.testArr.push(dict);
 
         this.socket.send(dict);
@@ -218,11 +216,14 @@ export class AppComponent implements OnInit {
     this.sColor = this.colors[rand];
   }
 
+  randStrokeType() {
+    let rand = Math.floor(Math.random()*this.strokeTypes.length);
+    this.sType = this.strokeTypes[rand];
+  }
+
   updatePaths(){
-    console.log('===in update paths func');
     let observable = this.socket.addPaths(this.testArr);
     observable.subscribe(data =>{
-      console.log('path data: ', data);
       if(data['message'] === "Success"){
         console.log("successfully updated paths");
       } else {
@@ -232,10 +233,8 @@ export class AppComponent implements OnInit {
   }
 
   postPaths(){
-    console.log('===in update paths func');
     let observable = this.socket.saveFirstPaths(this.testArr);
     observable.subscribe(data =>{
-      console.log('path data: ', data);
       if(data['message'] === "Success"){
         console.log("successfully posted paths");
       } else {

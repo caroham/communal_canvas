@@ -1,6 +1,37 @@
 <div id="instruction-overlay" *ngIf="showOverlay">
-    <h1>Instructions</h1>
-    <button (click)="closeOverlay()">Close</button>
+    <div id="instruction-content">
+        <p class="menu-title">Secret Menu</p>
+        <div class="menu-item">
+            <img src="" class="menu-img">
+            <div class="menu-text">
+                <p class="menu-h3">mouse click</p>
+                <p>change to a random color <br />&amp; stroke weight</p>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="" class="menu-img">
+            <div class="menu-text">
+                <p class="menu-h3">"+" key</p>
+                <p>increase stroke weight</p>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="" class="menu-img">
+            <div class="menu-text">
+                <p class="menu-h3">"-" key</p>
+                <p>decrease stroke weight</p>
+            </div>
+        </div>
+        <div class="menu-item">
+            <img src="" class="menu-img">
+            <div class="menu-text">
+                <p class="menu-h3">"w" key</p>
+                <p>random stroke weight</p>
+            </div>
+        </div>
+        <button (click)="closeOverlay()">hide</button>
+    </div>
 </div>
+<h1>Communal Canvas</h1>
 <canvas id="canvas" #canvas width="2000px" height="3000px"></canvas>
 <router-outlet></router-outlet>
