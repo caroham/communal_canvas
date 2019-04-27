@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild, HostListener, ElementRef, Host } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ElementRef, Host, OnDestroy, Renderer2 } from '@angular/core';
 import { SocketService } from './socket.service';
+import { HttpService } from './http.service';
 
 @Component({
   selector: 'app-root',
@@ -88,7 +89,7 @@ export class AppComponent implements OnInit {
 
 ///////////
 
-  constructor(private socket: SocketService){
+  constructor(private socket: SocketService, private _httpService: HttpService){
     this.initSocketConnect();
   }
 
@@ -241,10 +242,6 @@ export class AppComponent implements OnInit {
         console.log("didn't work! message: ", data['error']['message']);
       }
     })
-  }
-
-  closeOverlay() {
-    this.showOverlay = false;
   }
 
 }

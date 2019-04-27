@@ -6,3 +6,8 @@
 body {
     background-color: rgb(240, 234, 222);
 }
+
+
+.lock-scroll {
+    background-color: red;
+}
