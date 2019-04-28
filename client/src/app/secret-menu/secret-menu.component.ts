@@ -11,20 +11,21 @@ export class SecretMenuComponent implements OnInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private _httpService: HttpService) { 
-    this.renderer.addClass(document.body, 'lock-screen');
+    this.renderer.addClass(document.body, 'lock-scroll');
   }
 
   ngOnInit() {
-    this.showOverlay = this._httpService.showOverlay;
-    console.log("showOverlay in secret menu: ", this.showOverlay);
   }
 
   ngOnDestroy() {
-    this.renderer.removeClass(document.body, 'lock-screen');
+    console.log("in ngOnDestroy");
+    this.renderer.removeClass(document.body, 'lock-scroll');
   }
 
   closeOverlay() {
     this._httpService.closeOverlay();
+    this.showOverlay = this._httpService.showOverlay;
+    this.renderer.removeClass(document.body, 'lock-scroll');
   }
 
 }

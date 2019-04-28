@@ -9,5 +9,5 @@ body {
 
 
 .lock-scroll {
-    background-color: red;
+    overflow: hidden;
 }
