@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, HostListener, ElementRef, Host, OnDestroy, Renderer2 } from '@angular/core';
 import { SocketService } from './socket.service';
 import { HttpService } from './http.service';
+import { SecretMenuComponent } from './secret-menu/secret-menu.component';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +31,7 @@ export class AppComponent implements OnInit {
 
   canvasEl: HTMLCanvasElement;
   viewportOffset;
-  showOverlay = true;
+  showOverlay:boolean = this._httpService.showOverlay;
 
   sColor = "blue";
   sWeight = 20;
@@ -89,11 +90,15 @@ export class AppComponent implements OnInit {
 
 ///////////
 
-  constructor(private socket: SocketService, private _httpService: HttpService){
+  constructor(
+    private socket: SocketService, 
+    private _httpService: HttpService){
     this.initSocketConnect();
   }
 
   ngOnInit(){
+    console.log("showOverlay in app.component: ", this.showOverlay);
+
     this.canvasEl = (<HTMLCanvasElement>this.canvas.nativeElement);
     this.ctx = this.canvasEl.getContext('2d');
     this.w = this.canvasEl.width;

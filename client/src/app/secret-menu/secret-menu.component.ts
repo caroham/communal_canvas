@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
+import { HttpService } from '../http.service';
 
 @Component({
   selector: 'app-secret-menu',
@@ -6,14 +7,16 @@ import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
   styleUrls: ['./secret-menu.component.css']
 })
 export class SecretMenuComponent implements OnInit, OnDestroy {
-
-  constructor(private renderer: Renderer2) { 
+  showOverlay:boolean = this._httpService.showOverlay;
+  constructor(
+    private renderer: Renderer2,
+    private _httpService: HttpService) { 
     this.renderer.addClass(document.body, 'lock-screen');
   }
 
-  showOverlay = true;
-
   ngOnInit() {
+    this.showOverlay = this._httpService.showOverlay;
+    console.log("showOverlay in secret menu: ", this.showOverlay);
   }
 
   ngOnDestroy() {
@@ -21,7 +24,7 @@ export class SecretMenuComponent implements OnInit, OnDestroy {
   }
 
   closeOverlay() {
-    this.showOverlay = false;
+    this._httpService.closeOverlay();
   }
 
 }
