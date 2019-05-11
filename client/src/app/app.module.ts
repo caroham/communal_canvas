@@ -8,12 +8,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SecretMenuComponent } from './secret-menu/secret-menu.component';
 import { HttpService } from './http.service';
+import { CanvasComponent } from './canvas/canvas.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SecretMenuComponent
+    SecretMenuComponent,
+    CanvasComponent
   ],
   imports: [
     BrowserModule,

@@ -1,8 +1,4 @@
-*{
-    font-family: 'Poppins', sans-serif;
-}
-
-/* #canvas {
+#canvas {
     width: 2000px;
     height: 3000px;
     /* background-color: #ffbb7e; */
@@ -10,14 +6,6 @@
     /* background-color: #e9d9cb; */
     /* background-color: #f3d1b4;
     background-color: #fff; */
-    /*background-color: rgb(240, 234, 222);
+    background-color: rgb(240, 234, 222);
     z-index: 1;
-} */
-
-h1 {
-    font-size: 48px;
-    font-weight: 400;
-    z-index: 2;
-    position: fixed;
-    padding: 0 20px;
 }

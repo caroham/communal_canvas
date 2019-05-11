@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2, HostListener } from '@angular/core';
 import { HttpService } from '../http.service';
 
 @Component({
@@ -12,6 +12,11 @@ export class SecretMenuComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private _httpService: HttpService) { 
     this.renderer.addClass(document.body, 'lock-scroll');
+  }
+
+  @HostListener('mousedown', ['$event'])
+  onmousedown(event: MouseEvent){
+    console.log("clicked in secret menu component!")
   }
 
   ngOnInit() {
