@@ -43,22 +43,24 @@ export class CanvasComponent implements OnInit {
 
   @HostListener('mousemove', ['$event'])
   onmousemove(event: MouseEvent){
+    // console.log("in mousemove", event, event.type);
     if(this.showOverlay){return;}
-    console.log("in mousemove", event, event.type);
     this.findxy('move', event);
   }
 
   @HostListener('mouseup', ['$event'])
   onmouseup(event: MouseEvent){
+    this.showOverlay = this._httpService.showOverlay;
     if(this.showOverlay){return;}
     this.findxy('up', event);
   }
 
   @HostListener('mousedown', ['$event'])
   onmousedown(event: MouseEvent){
+    // console.log("clicked in app component!")
     if(this.showOverlay){return;}
     this.findxy('down', event);
-    console.log("clicked in app component!")
+
   }
 
   @HostListener('mouseout', ['$event'])
